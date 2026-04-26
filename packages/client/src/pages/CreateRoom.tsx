@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { getSocket } from '../lib/socket'
 
 export default function CreateRoom() {
   const navigate = useNavigate()
@@ -7,36 +8,48 @@ export default function CreateRoom() {
   const [roomName, setRoomName] = useState('')
   const [maxPlayers, setMaxPlayers] = useState('2')
   const [gameMode, setGameMode] = useState('classico')
-  const [roomCode, setRoomCode] = useState('')
-
-  const generateRoomCode = () => {
-    const code = Math.random().toString(36).substring(2, 8).toUpperCase()
-    setRoomCode(code)
-  }
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
   const handleCreateRoom = () => {
-    if (!playerName || !roomName || !roomCode) {
-      return
-    }
+    if (!playerName || !roomName) return
 
-    // TODO: Integrar com Socket.IO para criar sala no backend
-    console.log('Criando sala:', {
-      playerName,
-      roomName,
-      maxPlayers,
+    setLoading(true)
+    setError('')
+
+    const socket = getSocket()
+
+    socket.emit('create_room', {
+      name: roomName,
+      maxPlayers: parseInt(maxPlayers),
       gameMode,
-      roomCode
+      playerName,
     })
 
-    navigate(`/game/${roomCode}`)
+    socket.once('room_created', (data) => {
+      setLoading(false)
+
+      if (!data.success) {
+        setError(data.error || 'Erro ao criar sala')
+        return
+      }
+
+      // Salvar dados do jogador no localStorage
+      localStorage.setItem('domino_player', JSON.stringify({
+        id: data.playerId,
+        name: data.playerName || playerName,
+        roomCode: data.roomCode,
+      }))
+
+      navigate(`/game/${data.roomCode}`)
+    })
   }
 
-  const isFormValid = playerName && roomName && roomCode
+  const isFormValid = playerName && roomName
 
   return (
     <div className="min-h-screen bg-wood-grain flex items-center justify-center px-4">
       <div className="w-full max-w-md">
-        {/* Header */}
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-ivory-50">
             Criar <span className="text-amber-400">Sala</span>
@@ -44,13 +57,15 @@ export default function CreateRoom() {
           <p className="text-ivory-100/50 mt-2">Configure sua partida de dominó</p>
         </div>
 
-        {/* Form Card */}
         <div className="card space-y-5">
-          {/* Player Name */}
+          {error && (
+            <div className="bg-red-900/40 border border-red-500/40 rounded-lg px-4 py-3 text-red-300 text-sm">
+              ❌ {error}
+            </div>
+          )}
+
           <div>
-            <label htmlFor="input-player-name" className="label">
-              Nome do Jogador
-            </label>
+            <label htmlFor="input-player-name" className="label">Nome do Jogador</label>
             <input
               id="input-player-name"
               type="text"
@@ -62,11 +77,8 @@ export default function CreateRoom() {
             />
           </div>
 
-          {/* Room Name */}
           <div>
-            <label htmlFor="input-room-name" className="label">
-              Nome da Sala
-            </label>
+            <label htmlFor="input-room-name" className="label">Nome da Sala</label>
             <input
               id="input-room-name"
               type="text"
@@ -78,12 +90,9 @@ export default function CreateRoom() {
             />
           </div>
 
-          {/* Players + Mode Row */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label htmlFor="select-max-players" className="label">
-                Jogadores
-              </label>
+              <label htmlFor="select-max-players" className="label">Jogadores</label>
               <select
                 id="select-max-players"
                 value={maxPlayers}
@@ -95,11 +104,8 @@ export default function CreateRoom() {
                 <option value="4">4 Jogadores</option>
               </select>
             </div>
-
             <div>
-              <label htmlFor="select-game-mode" className="label">
-                Modo de Jogo
-              </label>
+              <label htmlFor="select-game-mode" className="label">Modo de Jogo</label>
               <select
                 id="select-game-mode"
                 value={gameMode}
@@ -112,51 +118,20 @@ export default function CreateRoom() {
             </div>
           </div>
 
-          {/* Room Code */}
-          <div>
-            <label className="label">Código da Sala</label>
-            <div className="flex gap-3">
-              <div className="flex-1 flex items-center justify-center 
-                              bg-wood-800/60 border border-wood-500/30 rounded-lg px-4 py-3
-                              min-h-[48px]">
-                {roomCode ? (
-                  <span className="text-xl font-mono font-bold text-amber-400 tracking-[0.3em]">
-                    {roomCode}
-                  </span>
-                ) : (
-                  <span className="text-ivory-100/30 text-sm">
-                    Clique para gerar →
-                  </span>
-                )}
-              </div>
-              <button
-                id="btn-generate-code"
-                type="button"
-                onClick={generateRoomCode}
-                className="btn-secondary whitespace-nowrap text-sm"
-              >
-                🎲 Gerar
-              </button>
-            </div>
-          </div>
-
-          {/* Submit */}
           <button
             id="btn-create-room"
             onClick={handleCreateRoom}
-            disabled={!isFormValid}
+            disabled={!isFormValid || loading}
             className="btn-primary w-full text-lg mt-2"
           >
-            Criar Sala
+            {loading ? '⏳ Criando...' : 'Criar Sala'}
           </button>
         </div>
 
-        {/* Back */}
         <button
           id="btn-back"
           onClick={() => navigate('/')}
-          className="mt-4 w-full text-center text-ivory-100/40 hover:text-ivory-100/70 
-                     transition-colors text-sm py-2"
+          className="mt-4 w-full text-center text-ivory-100/40 hover:text-ivory-100/70 transition-colors text-sm py-2"
         >
           ← Voltar ao início
         </button>

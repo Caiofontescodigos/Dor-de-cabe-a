@@ -24,13 +24,13 @@ export class RoomService {
   // ===============================
   // 🏠 CREATE ROOM
   // ===============================
-  async createRoom(config: RoomConfig): Promise<Room> {
+  async createRoom(config: RoomConfig, ownerSocketId: string): Promise<Room> {
     const code = this.generateCode();
 
     const ownerPlayer: Player = {
       id: this.generateId(),
       name: config.ownerName,
-      socketId: '',
+      socketId: ownerSocketId,
       roomCode: code,
       isReady: false,
       isActive: true,
@@ -239,6 +239,13 @@ export class RoomService {
     return Array.from(this.rooms.values())
       .filter((room) => room.status === 'waiting')
       .map((room) => this.getRoomInfo(room.code)!);
+  }
+
+  // ===============================
+  // 🎮 GET GAME STATE
+  // ===============================
+  getGameState(roomCode: string) {
+    return this.gameService.getGame(roomCode);
   }
 }
 
