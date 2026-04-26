@@ -2,6 +2,7 @@ import { Socket, Server as SocketIOServer } from 'socket.io';
 import { roomService } from '../services/RoomService.js';
 import { GameState } from '../services/GameService.js';
 import { Room } from '../types/room.js';
+import { sqsService } from '../services/SqsService.js';
 
 // ─────────────────────────────────────────────
 // Serializa o estado público do jogo (sem mãos)
@@ -83,6 +84,13 @@ export function registerGameHandlers(io: SocketIOServer, socket: Socket) {
 
       console.log(`🎯 Jogada: ${playerId} jogou ${dominoId} (${side}) em ${roomCode}`);
       broadcastGameState(io, roomCode, updated);
+
+      sqsService.sendMessage({
+        type: 'move_played',
+        roomCode,
+        timestamp: Date.now(),
+        data: { playerId, dominoId, side }
+      }).catch(console.error);
     } catch (err) {
       socket.emit('move_error', { error: 'Erro ao processar jogada' });
       console.error('❌ play_move:', err);
