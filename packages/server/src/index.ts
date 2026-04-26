@@ -4,6 +4,7 @@ import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
 import { registerRoomHandlers } from './handlers/roomHandlers.js';
+import { registerGameHandlers } from './handlers/gameHandlers.js';
 import { validateAwsConfig } from './config/aws.js';
 import { sqsService } from './services/SqsService.js';
 
@@ -26,9 +27,6 @@ app.use(express.json());
 // ROTAS HTTP
 // =====================================
 
-/**
- * Health check
- */
 app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
@@ -37,9 +35,6 @@ app.get('/health', (_req, res) => {
   });
 });
 
-/**
- * Info do servidor
- */
 app.get('/info', (_req, res) => {
   res.json({
     name: 'Dominó Online - Backend',
@@ -50,10 +45,7 @@ app.get('/info', (_req, res) => {
   });
 });
 
-/**
- * Listar filas SQS disponíveis (debug)
- */
-app.get('/debug/sqs-queues', async (req, res) => {
+app.get('/debug/sqs-queues', async (_req, res) => {
   const queues = await sqsService.listQueues();
   res.json({ queues });
 });
@@ -65,8 +57,8 @@ app.get('/debug/sqs-queues', async (req, res) => {
 io.on('connection', (socket) => {
   console.log(`\n✅ Cliente conectado: ${socket.id}`);
 
-  // Registrar handlers de sala
   registerRoomHandlers(io, socket);
+  registerGameHandlers(io, socket);
 
   socket.on('disconnect', () => {
     console.log(`\n❌ Cliente desconectado: ${socket.id}\n`);

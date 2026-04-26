@@ -1,5 +1,6 @@
 import { Socket, Server as SocketIOServer } from 'socket.io';
 import { roomService } from '../services/RoomService.js';
+import { broadcastGameState } from './gameHandlers.js';
 
 /**
  * Registrar todos os handlers de sala
@@ -19,15 +20,19 @@ export function registerRoomHandlers(io: SocketIOServer, socket: Socket) {
         maxPlayers,
         gameMode,
         ownerName: playerName,
-      });
+      }, socket.id);
+
+      socket.join(room.code);
 
       socket.emit('room_created', {
         success: true,
         roomCode: room.code,
         room,
+        playerId: room.players[0].id,
+        playerName: room.players[0].name,
       });
 
-      console.log(`📨 Sala criada por cliente: ${room.code}`);
+      console.log(`📨 Sala criada: ${room.code} por ${playerName}`);
     } catch (error) {
       socket.emit('room_created', {
         success: false,
@@ -63,16 +68,17 @@ export function registerRoomHandlers(io: SocketIOServer, socket: Socket) {
         success: true,
         player: result.player,
         room: result.room,
+        playerId: result.player?.id,
+        playerName: result.player?.name,
       });
 
-      // Notificar outros jogadores
       io.to(roomCode).emit('player_joined_notify', {
         player: result.player,
         players: result.room?.players,
         message: `${result.player?.name} entrou na sala`,
       });
 
-      console.log(`📨 Jogador entrou na sala: ${roomCode}`);
+      console.log(`📨 Jogador ${playerName} entrou na sala: ${roomCode}`);
     } catch (error) {
       socket.emit('room_joined', {
         success: false,
@@ -223,24 +229,26 @@ export function registerRoomHandlers(io: SocketIOServer, socket: Socket) {
     try {
       const { roomCode } = data;
 
-      const result = await roomService.startGame(roomCode);
+      const game = await roomService.startGame(roomCode);
 
-      if (!result) {
+      if (!game) {
         socket.emit('start_game_error', {
-          error: 'Não é possível iniciar o jogo',
+          error: 'Não é possível iniciar: sala inválida ou jogadores insuficientes',
         });
         return;
       }
 
-      const room = roomService.getRoomInfo(roomCode);
+      console.log(`📨 Jogo iniciado na sala: ${roomCode}`);
 
+      // Broadcast estado público + mãos individuais
+      broadcastGameState(io, roomCode, game);
+
+      // Também notifica que o jogo começou (para redirecionar UI)
       io.to(roomCode).emit('game_started_notify', {
         success: true,
-        room,
+        roomCode,
         message: 'Jogo iniciado!',
       });
-
-      console.log(`📨 Jogo iniciado na sala: ${roomCode}`);
     } catch (error) {
       socket.emit('start_game_error', {
         error: 'Erro ao iniciar jogo',
