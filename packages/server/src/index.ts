@@ -29,7 +29,7 @@ app.use(express.json());
 /**
  * Health check
  */
-app.get('/health', (req, res) => {
+app.get('/health', (_req, res) => {
   res.json({
     status: 'ok',
     timestamp: new Date().toISOString(),
@@ -40,7 +40,7 @@ app.get('/health', (req, res) => {
 /**
  * Info do servidor
  */
-app.get('/info', (req, res) => {
+app.get('/info', (_req, res) => {
   res.json({
     name: 'Dominó Online - Backend',
     version: '0.1.0',

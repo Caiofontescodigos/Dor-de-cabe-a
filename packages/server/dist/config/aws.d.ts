@@ -1,9 +1,6 @@
-/**
- * Configuração do cliente AWS SQS
- * Utiliza variáveis de ambiente para credenciais
- */
-export declare const sqsClient: any;
-export declare const SQS_QUEUE_URL: any;
+import { SQSClient } from '@aws-sdk/client-sqs';
+export declare const sqsClient: SQSClient;
+export declare const SQS_QUEUE_URL: string;
 /**
  * Validar configuração AWS antes de iniciar
  */

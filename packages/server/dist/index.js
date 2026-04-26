@@ -24,7 +24,7 @@ app.use(express.json());
 /**
  * Health check
  */
-app.get('/health', (_, res) => {
+app.get('/health', (_req, res) => {
     res.json({
         status: 'ok',
         timestamp: new Date().toISOString(),
@@ -34,7 +34,7 @@ app.get('/health', (_, res) => {
 /**
  * Info do servidor
  */
-app.get('/info', (_, res) => {
+app.get('/info', (_req, res) => {
     res.json({
         name: 'Dominó Online - Backend',
         version: '0.1.0',
@@ -46,7 +46,7 @@ app.get('/info', (_, res) => {
 /**
  * Listar filas SQS disponíveis (debug)
  */
-app.get('/debug/sqs-queues', async (_, res) => {
+app.get('/debug/sqs-queues', async (req, res) => {
     const queues = await sqsService.listQueues();
     res.json({ queues });
 });

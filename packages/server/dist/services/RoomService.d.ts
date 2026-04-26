@@ -1,21 +1,31 @@
 import { GameState } from './GameService';
-type Room = {
-    id: string;
-    players: string[];
-    game: GameState | null;
-};
+import { Player } from '../types/player';
+import { Room, RoomConfig, RoomInfo } from '../types/room';
 export declare class RoomService {
     private rooms;
+    private players;
     private gameService;
-    createRoom(roomId: string): Room;
-    joinRoom(roomId: string, playerId: string): Room | null;
-    leaveRoom(roomId: string, playerId: string): Room | null;
-    startGame(roomId: string): GameState | null;
+    private generateCode;
+    private generateId;
+    createRoom(config: RoomConfig): Promise<Room>;
+    joinRoom(roomCode: string, playerName: string, socketId: string): Promise<{
+        success: boolean;
+        error?: string;
+        player?: Player;
+        room?: Room;
+    }>;
+    leaveRoom(playerId: string): Promise<{
+        success: boolean;
+        roomDeleted?: boolean;
+    }>;
+    startGame(roomCode: string): Promise<GameState | null>;
     playMove(roomId: string, playerId: string, dominoId: string, side: 'left' | 'right'): GameState | null;
     passTurn(roomId: string, playerId: string): GameState | null;
     draw(roomId: string, playerId: string): GameState | null;
-    getRoom(roomId: string): Room | null;
+    getRoom(roomCode: string): Room | null;
+    getRoomInfo(roomCode: string): RoomInfo | null;
+    getPlayer(playerId: string): Player | null;
+    listRooms(): RoomInfo[];
 }
 export declare const roomService: RoomService;
-export {};
 //# sourceMappingURL=RoomService.d.ts.map

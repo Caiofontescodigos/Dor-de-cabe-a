@@ -18,6 +18,8 @@ export type GameState = {
     scores: Map<string, number>;
 };
 export declare class GameService {
+    private games;
+    getGame(gameId: string): GameState | null;
     createGame(gameId: string, players: string[]): GameState;
     playMove(game: GameState, playerId: string, dominoId: string, side: MoveSide): GameState | null;
     passTurn(game: GameState, playerId: string): GameState | null;

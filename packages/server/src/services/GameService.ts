@@ -26,6 +26,15 @@ export type GameState = {
 };
 
 export class GameService {
+  private games: Map<string, GameState> = new Map();
+
+  // ===============================
+  // 📦 GET GAME
+  // ===============================
+  getGame(gameId: string): GameState | null {
+    return this.games.get(gameId) || null;
+  }
+
   // ===============================
   // 🎲 CREATE GAME
   // ===============================
@@ -43,7 +52,7 @@ export class GameService {
 
     const currentPlayer = this.findStartingPlayer(hands, players);
 
-    return {
+    const game: GameState = {
       id: gameId,
       players,
       hands,
@@ -56,6 +65,9 @@ export class GameService {
       winType: null,
       scores: new Map(),
     };
+
+    this.games.set(gameId, game);
+    return game;
   }
 
   // ===============================

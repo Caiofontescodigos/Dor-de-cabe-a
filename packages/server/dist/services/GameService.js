@@ -1,4 +1,13 @@
 export class GameService {
+    constructor() {
+        this.games = new Map();
+    }
+    // ===============================
+    // 📦 GET GAME
+    // ===============================
+    getGame(gameId) {
+        return this.games.get(gameId) || null;
+    }
     // ===============================
     // 🎲 CREATE GAME
     // ===============================
@@ -11,7 +20,7 @@ export class GameService {
         });
         const stock = shuffled;
         const currentPlayer = this.findStartingPlayer(hands, players);
-        return {
+        const game = {
             id: gameId,
             players,
             hands,
@@ -24,6 +33,8 @@ export class GameService {
             winType: null,
             scores: new Map(),
         };
+        this.games.set(gameId, game);
+        return game;
     }
     // ===============================
     // 🎯 PLAY MOVE
