@@ -1,4 +1,4 @@
-import { roomService } from '../services/RoomService';
+import { roomService } from '../services/RoomService.js';
 /**
  * Registrar todos os handlers de sala
  */

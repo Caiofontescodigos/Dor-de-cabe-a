@@ -1,10 +1,11 @@
 import { SendMessageCommand, ReceiveMessageCommand, DeleteMessageCommand, ListQueuesCommand } from '@aws-sdk/client-sqs';
-import { sqsClient, SQS_QUEUE_URL, validateAwsConfig } from '../config/aws';
+import { sqsClient, SQS_QUEUE_URL, validateAwsConfig } from '../config/aws.js';
 /**
  * Serviço para integração com AWS SQS
  * Gerencia envio e recebimento de mensagens para sincronização distribuída
  */
 export class SqsService {
+    isAwsConfigured;
     constructor() {
         this.isAwsConfigured = validateAwsConfig();
     }

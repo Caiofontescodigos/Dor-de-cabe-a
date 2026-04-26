@@ -3,9 +3,9 @@ import express from 'express';
 import { createServer } from 'http';
 import { Server as SocketIOServer } from 'socket.io';
 import cors from 'cors';
-import { registerRoomHandlers } from './handlers/roomHandlers';
-import { validateAwsConfig } from './config/aws';
-import { sqsService } from './services/SqsService';
+import { registerRoomHandlers } from './handlers/roomHandlers.js';
+import { validateAwsConfig } from './config/aws.js';
+import { sqsService } from './services/SqsService.js';
 
 const app = express();
 const httpServer = createServer(app);

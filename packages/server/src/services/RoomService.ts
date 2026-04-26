@@ -1,8 +1,8 @@
 // packages/server/src/services/RoomService.ts
 
-import { GameService, GameState } from './GameService';
-import { Player } from '../types/player';
-import { Room, RoomConfig, RoomInfo } from '../types/room';
+import { GameService, GameState } from './GameService.js';
+import { Player } from '../types/player.js';
+import { Room, RoomConfig, RoomInfo } from '../types/room.js';
 
 export class RoomService {
   private rooms: Map<string, Room> = new Map();

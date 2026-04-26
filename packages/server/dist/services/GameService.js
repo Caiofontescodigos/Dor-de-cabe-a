@@ -1,7 +1,5 @@
 export class GameService {
-    constructor() {
-        this.games = new Map();
-    }
+    games = new Map();
     // ===============================
     // 📦 GET GAME
     // ===============================

@@ -4,7 +4,7 @@ import {
   DeleteMessageCommand,
   ListQueuesCommand
 } from '@aws-sdk/client-sqs';
-import { sqsClient, SQS_QUEUE_URL, validateAwsConfig } from '../config/aws';
+import { sqsClient, SQS_QUEUE_URL, validateAwsConfig } from '../config/aws.js';
 
 export interface SqsMessage {
   type: 'room_created' | 'player_joined' | 'player_left' | 'game_started' | 'game_ended' | 'move_played';

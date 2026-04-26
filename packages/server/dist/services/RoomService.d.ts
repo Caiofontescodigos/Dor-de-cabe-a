@@ -1,6 +1,6 @@
-import { GameState } from './GameService';
-import { Player } from '../types/player';
-import { Room, RoomConfig, RoomInfo } from '../types/room';
+import { GameState } from './GameService.js';
+import { Player } from '../types/player.js';
+import { Room, RoomConfig, RoomInfo } from '../types/room.js';
 export declare class RoomService {
     private rooms;
     private players;

@@ -1,5 +1,5 @@
 import { Socket, Server as SocketIOServer } from 'socket.io';
-import { roomService } from '../services/RoomService';
+import { roomService } from '../services/RoomService.js';
 
 /**
  * Registrar todos os handlers de sala

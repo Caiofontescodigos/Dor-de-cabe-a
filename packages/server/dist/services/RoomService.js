@@ -1,11 +1,9 @@
 // packages/server/src/services/RoomService.ts
-import { GameService } from './GameService';
+import { GameService } from './GameService.js';
 export class RoomService {
-    constructor() {
-        this.rooms = new Map();
-        this.players = new Map();
-        this.gameService = new GameService();
-    }
+    rooms = new Map();
+    players = new Map();
+    gameService = new GameService();
     // ===============================
     // 🔑 HELPERS PRIVADOS
     // ===============================

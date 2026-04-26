@@ -1,5 +1,5 @@
-import { GameMode, GameStatus } from './game';
-import { Player } from './player';
+import { GameMode, GameStatus } from './game.js';
+import { Player } from './player.js';
 export interface Room {
     code: string;
     name: string;
